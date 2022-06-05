@@ -13,7 +13,7 @@ export interface QuoteMessage extends Message {
   // exchange = crypto only
   x?: string
   t: string
-
+  
   // conditions - stock only
   c?: string[]
   z?: string

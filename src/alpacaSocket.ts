@@ -82,6 +82,7 @@ export class AlpacaSocket extends EventEmitter {
       } else if (leading.T === 'success') {
         const successMessage = leading as SuccessMessage
         if (successMessage.msg === 'authenticated') {
+          logger.info('Authenticated successfully...ready for subscriptions')
           this.emit(AlpacaSocket.READY_EVENT)
           this.isReady = true
         } else if (successMessage.msg === 'connected') {

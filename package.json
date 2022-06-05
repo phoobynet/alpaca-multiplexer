@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node .",
-    "dev": "nodemon --watch src --ext js,ts src/server.ts --port=3002 --alpacaURL=wss://stream.data.alpaca.markets/v1beta1/crypto"
+    "dev": "nodemon --watch src --ext js,ts src/server.ts --port=3002 --alpacaURL=wss://stream.data.alpaca.markets/v1beta1/crypto",
+    "client": "ts-node src/client.ts"
   },
   "author": "",
   "license": "ISC",
@@ -38,6 +39,7 @@
     "envalid": "^7.3.1",
     "express": "^4.18.1",
     "helmet": "^5.1.0",
+    "merge": "^2.1.1",
     "morgan": "^1.10.0",
     "reflect-metadata": "^0.1.13",
     "socket.io": "^4.5.1",
