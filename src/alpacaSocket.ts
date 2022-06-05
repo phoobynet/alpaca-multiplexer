@@ -41,7 +41,8 @@ export class AlpacaSocket extends EventEmitter {
       request.quotes?.length ||
       request.bars?.length
     ) {
-      logger.info('Request:' + JSON.stringify(request, null, 2))
+      logger.info('sending')
+      logger.info(request)
       if (this.socket) {
         this.socket.send(JSON.stringify(request))
       } else {
