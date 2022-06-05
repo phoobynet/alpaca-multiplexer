@@ -6,8 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node .",
-    "dev": "nodemon --watch src --ext js,ts src/server.ts",
-    "start-client": "ts-node ./src/client.ts"
+    "dev": "nodemon --watch src --ext js,ts src/server.ts --port=3002 --alpacaURL=wss://stream.data.alpaca.markets/v1beta1/crypto"
   },
   "author": "",
   "license": "ISC",
@@ -19,6 +18,8 @@
     "@types/node": "^17.0.39",
     "@types/uuid": "^8.3.4",
     "@types/ws": "^8.5.3",
+    "@types/yargs": "^17.0.10",
+    "@types/yargs-parser": "^21.0.0",
     "@typescript-eslint/eslint-plugin": "^5.27.0",
     "@typescript-eslint/parser": "^5.27.0",
     "eslint": "^8.17.0",
@@ -40,9 +41,12 @@
     "morgan": "^1.10.0",
     "reflect-metadata": "^0.1.13",
     "socket.io": "^4.5.1",
+    "ts-command-line-args": "^2.3.1",
     "typeorm": "^0.3.6",
     "uuid": "^8.3.2",
     "winston": "^3.7.2",
-    "ws": "^8.7.0"
+    "ws": "^8.7.0",
+    "yargs": "^17.5.1",
+    "yargs-parser": "^21.0.1"
   }
 }

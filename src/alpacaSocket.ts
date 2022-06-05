@@ -1,68 +1,9 @@
 import EventEmitter from 'events'
-import WebSocket, { ErrorEvent, MessageEvent, RawData } from 'ws'
+import WebSocket, { ErrorEvent, RawData } from 'ws'
 import { logger } from './logger'
-import { Env } from './env'
-import { Request } from './request'
-
-export interface Message {
-  T: 'q' | 't' | 'b' | 'error' | 'subscription' | 'success'
-}
-
-export interface ErrorMessage extends Message {
-  code: number
-  msg: string
-}
-
-export interface SuccessMessage extends Message {
-  msg: string
-}
-
-export interface SubscriptionMessage extends Message {
-  trades: string[]
-  quotes: string[]
-  bars: []
-}
-
-export interface TradeMessage extends Message {
-  i: number
-  // symbol
-  S: string
-  // exchange
-  x: string
-  // price
-  p: number
-  // size
-  s: number
-  // timestamp
-  t: string
-  // conditions
-  c: string[]
-  // tape
-  z: string
-}
-
-export interface QuoteMessage extends Message {
-  S: string
-  bx: string
-  bp: number
-  bs: number
-  ax: string
-  ap: number
-  as: number
-  t: string
-  c: string[]
-  z: string
-}
-
-export interface BarMessage extends Message {
-  S: string
-  o: number
-  h: number
-  l: number
-  c: number
-  v: number
-  t: string
-}
+import { Request, Message, ErrorMessage, SuccessMessage } from './types'
+import { env } from './env'
+import { getConfiguration } from './getConfiguration'
 
 export class AlpacaSocket extends EventEmitter {
   private socket!: WebSocket
@@ -74,8 +15,24 @@ export class AlpacaSocket extends EventEmitter {
   public static readonly CLOSE_EVENT = 'CLOSE'
   private isReady: boolean = false
 
-  constructor(private url: string, private env: Env) {
+  private constructor(private url: string) {
     super()
+
+    process.on('SIGINT', () => {
+      this.stop()
+    })
+
+    process.on('SIGTERM', () => {
+      this.stop()
+    })
+  }
+
+  static instance(): AlpacaSocket {
+    if (!_alpacaSocket) {
+      _alpacaSocket = new AlpacaSocket(getConfiguration().alpacaURL)
+    }
+
+    return _alpacaSocket
   }
 
   send(request: Request): void {
@@ -87,21 +44,27 @@ export class AlpacaSocket extends EventEmitter {
   }
 
   start() {
+    if (this.socket) {
+      this.socket.close()
+    }
     this.socket = new WebSocket(this.url)
     this.socket.on('close', () => {
-      this.isReady = false
+      logger.info('Alpaca socket closed')
       this.emit(AlpacaSocket.CLOSE_EVENT)
+      this.isReady = false
     })
     this.socket.on('open', () => {
+      logger.info('Alpaca socket opened...will attempt to authenticate')
       this.socket.send(
         JSON.stringify({
           action: 'auth',
-          key: this.env.APCA_API_KEY_ID,
-          secret: this.env.APCA_API_SECRET_KEY,
+          key: env.APCA_API_KEY_ID,
+          secret: env.APCA_API_SECRET_KEY,
         }),
       )
     })
     this.socket.on('error', (error: ErrorEvent) => {
+      logger.info('Alpaca socket error: ' + error.message)
       this.emit(AlpacaSocket.ERROR_EVENT, error)
       this.isReady = false
     })
@@ -138,3 +101,5 @@ export class AlpacaSocket extends EventEmitter {
     }
   }
 }
+
+let _alpacaSocket: AlpacaSocket

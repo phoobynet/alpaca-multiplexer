@@ -1,22 +1,19 @@
 import WebSocket, { RawData, WebSocketServer } from 'ws'
 import { v4 as uuid } from 'uuid'
 import { logger } from './logger'
-import { AlpacaSocket, Message, SubscriptionMessage } from './alpacaSocket'
-import { env } from './env'
-import { Request } from './request'
+import { AlpacaSocket } from './alpacaSocket'
+import { Request, Message, SubscriptionMessage } from './types'
+import { getConfiguration } from './getConfiguration'
 
 let readyForSubscriptions = false
-
 const socketMap = new Map<string, WebSocket>()
-const PORT = process.env.ALPACA_MULTIPLEXER_PORT || '3002'
-const alpacaSocket = new AlpacaSocket(
-  'wss://stream.data.alpaca.markets/v1beta1/crypto',
-  env,
-)
 
 const wss = new WebSocketServer({
-  port: parseInt(PORT),
+  port: getConfiguration().port,
 })
+
+const alpacaSocket = AlpacaSocket.instance()
+
 alpacaSocket.on(
   AlpacaSocket.SUBSCRIPTION_EVENT,
   (subscription: SubscriptionMessage) => {
@@ -29,6 +26,7 @@ alpacaSocket.on(AlpacaSocket.MESSAGES_EVENT, (messages: Message[]) => {
   })
 })
 alpacaSocket.on(AlpacaSocket.ERROR_EVENT, (error: Error) => {
+  console.log('AlpacaSocket.Error:' + error)
   logger.error(error)
 })
 
@@ -103,21 +101,10 @@ wss.on('close', function close() {
   clearInterval(interval)
 })
 
-process.on('beforeExit', () => {
-  logger.info('Before exit is running')
-  socketMap.forEach((socket, id) => {
-    socket.send(
-      JSON.stringify({
-        type: 'message',
-        data: `Goodbye ${id}`,
-      }),
-    )
-    socket.terminate()
-  })
-})
+process.on('SIGINT', close)
+process.on('SIGTERM', close)
 
-// interface SubscriptionRequest {
-//   trades: string[]
-//   bars: string[]
-//   quotes: string[]
-// }
+function close() {
+  wss.close()
+  process.exit(0)
+}
