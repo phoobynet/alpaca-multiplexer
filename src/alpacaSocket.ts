@@ -36,10 +36,17 @@ export class AlpacaSocket extends EventEmitter {
   }
 
   send(request: Request): void {
-    if (this.socket) {
-      this.socket.send(JSON.stringify(request))
-    } else {
-      throw new Error('Attempted to send, but no socket was available')
+    if (
+      request.trades?.length ||
+      request.quotes?.length ||
+      request.bars?.length
+    ) {
+      logger.info('Request:' + JSON.stringify(request, null, 2))
+      if (this.socket) {
+        this.socket.send(JSON.stringify(request))
+      } else {
+        throw new Error('Attempted to send, but no socket was available')
+      }
     }
   }
 

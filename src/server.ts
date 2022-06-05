@@ -31,7 +31,8 @@ alpacaSocket.on(AlpacaSocket.MESSAGES_EVENT, (messages: Message[]) => {
     const client = socketMap.get(id)
 
     if (!client) {
-      throw new Error('Client does not exist')
+      logger.warn(`Client with id "${id}" is no longer available`)
+      return
     }
 
     const messagesForClient: Message[] = []
@@ -58,9 +59,8 @@ alpacaSocket.on(AlpacaSocket.MESSAGES_EVENT, (messages: Message[]) => {
   })
 })
 alpacaSocket.on(AlpacaSocket.ERROR_EVENT, (error: Error) => {
-  logger.error(error)
+  logger.error(error.message)
 })
-
 alpacaSocket.on(AlpacaSocket.READY_EVENT, () => {
   readyForSubscriptions = true
   wss.clients.forEach((client) => {
@@ -94,7 +94,11 @@ function onConnection(ws: WebSocket & { isAlive?: boolean }) {
 
         // before proceeding take a snapshot of all subscribers subscriptions
         const preUpdateSubscriptionSnapshot = merge(
-          Array.from(clientsSubscriptions.values()),
+          ...Array.from(clientsSubscriptions.values()),
+        )
+        console.log(
+          'preUpdateSubscriptionSnapshot:',
+          preUpdateSubscriptionSnapshot,
         )
 
         let clientSubscriptions = clientsSubscriptions.get(id)
@@ -128,7 +132,12 @@ function onConnection(ws: WebSocket & { isAlive?: boolean }) {
         }
 
         const postUpdateSubscriptionSnapshot = merge(
-          Array.from(clientsSubscriptions.values()),
+          ...Array.from(clientsSubscriptions.values()),
+        )
+
+        console.log(
+          'postUpdateSubscriptionSnapshot:',
+          postUpdateSubscriptionSnapshot,
         )
         const { added, removed } = subscriptionDiff(
           preUpdateSubscriptionSnapshot,
@@ -154,18 +163,32 @@ function onConnection(ws: WebSocket & { isAlive?: boolean }) {
         )
       }
     } catch (e) {
+      console.log('Hello, something went wrong during message processing:', e)
       logger.error(e)
     }
   })
 
-  ws.on('close', () => {
+  ws.once('close', () => {
+    logger.info(`Closing ${id}`)
+    const preUpdateSubscriptionSnapshot = merge(
+      ...Array.from(clientsSubscriptions.values()),
+    )
+
+    socketMap.delete(id)
+    clientsSubscriptions.delete(id)
+
+    const postUpdateSubscriptionSnapshot = merge(
+      ...Array.from(clientsSubscriptions.values()),
+    )
+    const { removed } = subscriptionDiff(
+      preUpdateSubscriptionSnapshot,
+      postUpdateSubscriptionSnapshot,
+    )
+
     alpacaSocket.send({
       action: 'unsubscribe',
-      trades: ['*'],
-      bars: ['*'],
-      quotes: ['*'],
+      ...removed,
     })
-    socketMap.delete(id)
   })
 
   ws.send(

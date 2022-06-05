@@ -33,14 +33,8 @@ client.on('close', () => {
 })
 
 setTimeout(() => {
-  console.log('Sending unsubscribe')
-  client.send(
-    JSON.stringify({
-      action: 'unsubscribe',
-      trades: ['BTCUSD'],
-    }),
-  )
-}, 10_000)
+  process.exit(0)
+}, 20_000)
 
 process.on('SIGINT', () => {
   process.exit(0)

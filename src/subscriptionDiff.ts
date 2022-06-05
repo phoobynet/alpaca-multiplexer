@@ -12,8 +12,8 @@ const diffField = (
 ): [string[], string[]] => {
   const oldField = o[field] || []
   const newField = n[field] || []
-  const removed = oldField.filter((x) => newField.indexOf(x) === -1)
-  const added = newField.filter((x) => oldField.indexOf(x) === -1)
+  const removed = oldField.filter((x) => !newField.includes(x))
+  const added = newField.filter((x) => !oldField.includes(x))
 
   return [removed, added]
 }
