@@ -1,7 +1,7 @@
 import WebSocket from 'ws'
 
 const client: WebSocket & { pingTimeout?: ReturnType<typeof setTimeout> } =
-  new WebSocket('ws://localhost:3002')
+  new WebSocket('ws://0.0.0.0:8080')
 
 function heartbeat() {
   clearTimeout(client.pingTimeout)

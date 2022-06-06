@@ -4,10 +4,11 @@
   "description": "Multiplexer for real time data from Alpaca",
   "main": "dist/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node .",
+    "build": "tsc",
     "dev": "nodemon --watch src --ext js,ts src/server.ts --port=3002 --alpacaURL=wss://stream.data.alpaca.markets/v1beta1/crypto",
-    "client": "ts-node src/example/client.ts"
+    "example.client": "ts-node src/example/client.ts",
+    "example.simple-client": "ts-node src/example/simple-client.ts"
   },
   "author": "",
   "license": "ISC",
