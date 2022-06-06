@@ -54,13 +54,13 @@ APCA_API_SECRET_KEY=<your secret>
 
 ## Run
 
-#### Stock
+#### Crypto
 
 ```bash
 node dist/index.js --port=3002 --alpacaURL=wss://stream.data.alpaca.markets/v1beta1/crypto
 ```
 
-#### Crypto
+#### Stock
 
 ```bash
 node dist/index.js --port=3003 --alpacaURL=wss://stream.data.alpaca.markets/v2/sip
