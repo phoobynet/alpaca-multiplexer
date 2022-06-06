@@ -125,7 +125,13 @@ export class ServerSocket extends EventEmitter {
             this.clientSubscriptions.set(id, clientSubscription as Subscription)
           }
         } else {
-          logger.error('Dude, what the fuck!')
+          logger.error('User tried to use unrecognised action')
+          ws.send(
+            JSON.stringify({
+              T: 'error',
+              msg: 'Unrecognised action',
+            }),
+          )
           return
         }
 
