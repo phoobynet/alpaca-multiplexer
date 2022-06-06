@@ -7,11 +7,19 @@ Alpaca only permits a single connection to a real-time endpoint.
 What this does is provide a proxy to the specified endpoint (stock or crypto) that many clients can connect at the same
 time.
 
+## Should I use it?
+
+**I will not offer ANY guarantees for this library.**
+
+It was developed to help me develop personal work product built on top of Alpaca's API/WS services.
+
+**USE IT AT YOUR OWN RISK**
+
 ## Does it scale?
 
-This is for personal use on a small number of assets.
+I have no idea. This is for **personal use** on a small number of assets.
 
-**Don't do something like this.**
+**Don't be a maniac and do something like this.**
 
 ```json
 {

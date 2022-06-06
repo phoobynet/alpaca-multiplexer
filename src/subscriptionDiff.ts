@@ -1,6 +1,6 @@
 import { Subscription } from './types'
 
-interface SubscriptionDiff {
+export interface SubscriptionDiff {
   added: Subscription
   removed: Subscription
 }
@@ -18,6 +18,11 @@ const diffField = (
   return [removed, added]
 }
 
+/**
+ * Produces a deep diff between the old and new subscriptions
+ * @param {Subscription} o - the old subscription
+ * @param {Subscription} n - the new subscription
+ */
 export const subscriptionDiff = (
   o: Subscription,
   n: Subscription,
