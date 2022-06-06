@@ -1,7 +1,6 @@
 import WebSocket, { RawData } from 'ws'
 
-const client: WebSocket & { pingTimeout?: ReturnType<typeof setTimeout> } =
-  new WebSocket('ws://0.0.0.0:8080')
+const client = new WebSocket('ws://0.0.0.0:8080')
 
 client.on('open', () => {
   client.send(
@@ -17,6 +16,12 @@ client.on('message', (data: RawData) => {
 })
 
 setTimeout(() => {
+  client.send(
+    JSON.stringify({
+      action: 'unsubscribe',
+      trades: ['BTCUSD'],
+    }),
+  )
   client.close()
   process.exit(0)
 }, 10_000)
